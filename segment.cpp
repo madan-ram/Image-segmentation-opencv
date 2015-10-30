@@ -37,12 +37,14 @@ int main(int argc, char **argv) {
 
   int num_ccs;
   std::list<bounded_box> bounded_box_list = segment_bounded_box(input, sigma, k, min_size, &num_ccs); 
+  image<rgb> *seg = segment_image(input, sigma, k, min_size, &num_ccs); 
+
   for(std::list<bounded_box>::iterator it=bounded_box_list.begin(); it!=bounded_box_list.end();  ++it) {
-  	printf("%d, %d, %d, %d\n", (*it).min_x, (*it).min_y, (*it).max_x, (*it).max_y);
+    printf("%d, %d, %d, %d\n", (*it).min_x, (*it).min_y, (*it).max_x, (*it).max_y);
+    rectange(&input, cv::Point((*it).min_x, (*it).min_y), cv::Point((*it).max_x, (*it).max_y), cv::Scalar(0, 0, 255));
   }
 
-  image<rgb> *seg = segment_image(input, sigma, k, min_size, &num_ccs); 
-  imwrite(argv[5], seg);
+  imwrite(argv[5], input);
 
   return 0;
 }

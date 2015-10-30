@@ -7,10 +7,7 @@
 #include <opencv/highgui.h>
 #include <iostream>
 
-image<rgb> *imread(const char *name) {
-
-	cv::Mat cv_img;
-	cv_img = cv::imread(name, CV_LOAD_IMAGE_COLOR);
+image<rgb> *convert_to_imageRGB(const cv::Mat cv_img) {
 	cv::Size s = cv_img.size();
 	int height = s.height;
 	int width = s.width;
@@ -26,6 +23,14 @@ image<rgb> *imread(const char *name) {
 			imRef(im, x, y) = color_pix;
 		}
 	}
+	return im;
+}
+
+image<rgb> *imread(const char *name) {
+
+	cv::Mat cv_img;
+	cv_img = cv::imread(name, CV_LOAD_IMAGE_COLOR);
+	image<rgb> *im = convert_to_imageRGB(cv_img);
 
 	cv_img.release();
 	return im;
@@ -57,5 +62,13 @@ void imwrite(const char *name, const image<rgb> *im) {
 
 	cv::Mat image = convert_to_cv(im);
 	cv::imwrite(name, image);
+	image.release();
+}
+
+void rectange(image<rgb> **imPt, const cv::Point p1, const cv::Point p2, const cv::Scalar color) {
+	cv::Mat image = convert_to_cv(*imPt);
+	cv::rectangle(image, p1, p2, color);
+	delete *imPt;
+	*imPt = convert_to_imageRGB(image);
 	image.release();
 }

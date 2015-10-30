@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 typedef struct {
   int x, y;
-} point;
+} Point;
 
 typedef struct {
   int min_x;
@@ -60,10 +60,10 @@ static inline float diff(image<float> *r, image<float> *g, image<float> *b,
 	      square(imRef(b, x1, y1)-imRef(b, x2, y2)));
 }
 
-bool compare_x(point a, point b) {
+bool compare_x(Point a, Point b) {
   return a.x<b.x; 
 }
-bool compare_y(point a, point b) { 
+bool compare_y(Point a, Point b) { 
   return a.y<b.y; 
 }
 
@@ -267,11 +267,11 @@ std::list<bounded_box> segment_bounded_box(image<rgb> *im, float sigma, float c,
   }
 
   /*create mapping id with component*/
-  std::list<point> data[unique_comp.size()];
+  std::list<Point> data[unique_comp.size()];
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       int comp = u->find(y * width + x);
-      point p;
+      Point p;
       p.x = x;
       p.y = y;
       data[map_comp[comp]].push_back(p);
