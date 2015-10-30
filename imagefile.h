@@ -31,7 +31,10 @@ image<rgb> *imread(const char *name) {
 	return im;
 }
 
-cv::Mat convert_to_cv(const image<rgb> *im, const int width, const int height) {
+cv::Mat convert_to_cv(const image<rgb> *im) {
+	int height = im->height();
+	int width = im->width();
+
 	cv::Mat image(height, width, CV_8UC3);
 
 	for(int y=0; y<height; y++) {
@@ -52,7 +55,7 @@ void imwrite(const char *name, const image<rgb> *im) {
 	int height = im->height();
 	int width = im->width();
 
-	cv::Mat image = convert_to_cv(im, width, height);
+	cv::Mat image = convert_to_cv(im);
 	cv::imwrite(name, image);
 	image.release();
 }
