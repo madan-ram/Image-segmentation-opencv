@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <filter.h>
 #include <list>
 #include <set>
+#include <unordered_map>
 #include <iostream>
 #include "segment-graph.h"
 
@@ -249,26 +250,40 @@ std::list<bounded_box> segment_bounded_box(image<rgb> *im, float sigma, float c,
   delete [] edges;
   *num_ccs = u->num_sets();
 
+  /*get unique components*/
   std::set<int> unique_comp;
-  std::list<point> data[width*height];
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      int comp = u->find(y * width + x);
+      unique_comp.insert(comp);
+    }
+  }
+
+  std::unordered_map <int, int> map_comp;
+  /*create map between comp and sequence_id*/
+  int count = 0;
+  for(std::set<int>::iterator it=unique_comp.begin(); it!=unique_comp.end();  ++it, count++) {
+    map_comp[*it] = count;
+  }
+
+  /*create mapping id with component*/
+  std::list<point> data[unique_comp.size()];
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       int comp = u->find(y * width + x);
       point p;
       p.x = x;
       p.y = y;
-      data[comp].push_back(p);
-      unique_comp.insert(comp);
+      data[map_comp[comp]].push_back(p);
     }
   }
 
   std::list<bounded_box> bounded_box_list;
-
   for(std::set<int>::iterator it=unique_comp.begin(); it!=unique_comp.end();  ++it) {
-    int max_x = (*std::max_element(data[*it].begin(), data[*it].end(), compare_x)).x;
-    int max_y = (*std::max_element(data[*it].begin(), data[*it].end(), compare_y)).y;
-    int min_x = (*std::min_element(data[*it].begin(), data[*it].end(), compare_x)).x;
-    int min_y = (*std::min_element(data[*it].begin(), data[*it].end(), compare_y)).y;
+    int max_x = (*std::max_element(data[map_comp[*it]].begin(), data[map_comp[*it]].end(), compare_x)).x;
+    int max_y = (*std::max_element(data[map_comp[*it]].begin(), data[map_comp[*it]].end(), compare_y)).y;
+    int min_x = (*std::min_element(data[map_comp[*it]].begin(), data[map_comp[*it]].end(), compare_x)).x;
+    int min_y = (*std::min_element(data[map_comp[*it]].begin(), data[map_comp[*it]].end(), compare_y)).y;
     bounded_box b;
     b.min_x = min_x;
     b.min_y = min_y;
@@ -278,11 +293,9 @@ std::list<bounded_box> segment_bounded_box(image<rgb> *im, float sigma, float c,
     bounded_box_list.push_back(b);
   }
 
-
-
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      data[y * width + x].clear();
+      data[map_comp[y * width + x]].clear();
     }
   }  
   unique_comp.clear();
