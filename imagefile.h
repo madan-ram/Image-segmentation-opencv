@@ -30,3 +30,29 @@ image<rgb> *imread(const char *name) {
 	cv_img.release();
 	return im;
 }
+
+cv::Mat convert_to_cv(const image<rgb> *im, const int width, const int height) {
+	cv::Mat image(height, width, CV_8UC3);
+
+	for(int y=0; y<height; y++) {
+		for(int x=0; x<width; x++) {
+			cv::Vec3b intensity;
+			intensity.val[0] = imRef(im, x, y).b;
+			intensity.val[1] = imRef(im, x, y).g;
+			intensity.val[2] = imRef(im, x, y).r;
+			image.at<cv::Vec3b>(y, x) = intensity;
+		}
+	}
+
+	return image;
+}
+
+void imwrite(const char *name, const image<rgb> *im) {
+	/* (*im). <==> img-> */
+	int height = im->height();
+	int width = im->width();
+
+	cv::Mat image = convert_to_cv(im, width, height);
+	cv::imwrite(name, image);
+	image.release();
+}

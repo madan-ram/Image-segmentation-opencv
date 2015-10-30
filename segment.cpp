@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
   }
 
   image<rgb> *seg = segment_image(input, sigma, k, min_size, &num_ccs); 
-  savePPM(seg, argv[5]);
+  imwrite(argv[5], seg);
 
   return 0;
 }
