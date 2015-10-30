@@ -10,8 +10,8 @@ LINK   = -lm
 
 all: segment
 
-segment: segment.cpp segment-image.h segment-graph.h disjoint-set.h
-	$(CPP) $(CFLAGS) -o segment segment.cpp $(LINK)
+segment: segment.cpp segment-image.h segment-graph.h disjoint-set.h imagefile.h
+	$(CPP) -std=c++0x $(CFLAGS) -o segment segment.cpp $(LINK) `pkg-config --cflags --libs opencv`
 
 clean:
 	/bin/rm -f segment *.o

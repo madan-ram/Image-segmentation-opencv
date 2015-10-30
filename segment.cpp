@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <image.h>
 #include <misc.h>
 #include <pnmfile.h>
+#include <imagefile.h>
 #include "segment-image.h"
 
 int main(int argc, char **argv) {
@@ -33,8 +34,8 @@ int main(int argc, char **argv) {
   float k = atof(argv[2]);
   int min_size = atoi(argv[3]);
 
-  image<rgb> *input = loadPPM(argv[4]);
-	
+	image<rgb> *input = imread(argv[4]);
+
   int num_ccs;
   std::list<bounded_box> bounded_box_list = segment_bounded_box(input, sigma, k, min_size, &num_ccs); 
   for(std::list<bounded_box>::iterator it=bounded_box_list.begin(); it!=bounded_box_list.end();  ++it) {
