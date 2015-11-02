@@ -105,8 +105,8 @@ image<rgb> *numpy_to_image(np::array& array) {
 		for(int x=0; x<width; x++) {
 			rgb color_pix;
 			color_pix.b = extract<boost::uint8_t>(array[make_tuple(y, x, 0)])();
-			/*color_pix.g = extract<boost::uint8_t>(array[make_tuple(y, x, 1)]);
-			color_pix.r = extract<boost::uint8_t>(array[make_tuple(y, x, 2)]);*/
+			color_pix.g = extract<boost::uint8_t>(array[make_tuple(y, x, 1)])();
+			color_pix.r = extract<boost::uint8_t>(array[make_tuple(y, x, 2)])();
 			imRef(im, x, y) = color_pix;
 		}
 	}
