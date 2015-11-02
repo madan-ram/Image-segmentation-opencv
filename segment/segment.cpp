@@ -98,7 +98,7 @@ struct enable_numpy_scalar_converter
 image<rgb> *numpy_to_image(np::array& array) {
 	object shape = array.attr("shape");
 	int height = extract<int>(shape[0]);
-    int width = extract<int>(shape[1]);
+  int width = extract<int>(shape[1]);
 
 	image<rgb> *im = new image<rgb>(width, height);
 	for(int y=0; y<height; y++) {
@@ -111,6 +111,31 @@ image<rgb> *numpy_to_image(np::array& array) {
 		}
 	}
 	return im;
+}
+
+np::array image_to_numpy(image<rgb> * im) {
+
+  int height = im->height();
+  int width = im->width();
+  
+  
+  npy_intp dims[3]{height, width, 3};
+  PyObject * image_py = PyArray_SimpleNew(3, dims, NPY_UINT8);
+  handle<> handle( image_py );
+  np::array np_image( handle );
+
+  for(int y=0; y<height; y++) {
+    for(int x=0; x<width; x++) {
+
+      rgb color_pix;
+      color_pix = imRef(im, x, y);
+
+      np_image[make_tuple(y, x, 0)] = color_pix.b;
+      np_image[make_tuple(y, x, 1)] = color_pix.g;
+      np_image[make_tuple(y, x, 2)] = color_pix.r;
+    }
+  }
+  return np_image;
 }
 
 list get_bounded_box(np::array& np_image, double sigma, int k, int min_size) {
@@ -135,10 +160,19 @@ list get_bounded_box(np::array& np_image, double sigma, int k, int min_size) {
     return t1;
 }
 
+np::array segmented_image(np::array& np_image, double sigma, int k, int min_size) {
+  int num_ccs;
+  image<rgb> *im = numpy_to_image(np_image);
+  image<rgb> *seg = segment_image(im, sigma, k, min_size, &num_ccs);
+  return image_to_numpy(seg);
+}
+
 BOOST_PYTHON_MODULE(segment){
+  import_array();
   enable_numpy_scalar_converter<boost::uint8_t, NPY_UBYTE>();
   np::array::set_module_and_type( "numpy", "ndarray");
   def("get_bounded_box", &get_bounded_box);
+  def("segmented_image", &segmented_image);
 }
 
 
